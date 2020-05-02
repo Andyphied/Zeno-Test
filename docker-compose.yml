@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  api:
+    build:
+      context: ./app_dir
+      dockerfile: Dockerfile
+    volumes:
+      - './app_dir:/usr/src/app'
+    ports:
+      - 5002:5000
+    environment:
+      - FLASK_CONFIG=development
+      - FLASK_ENV=development
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - MONGO_URI='mongodb://localhost:27017/py_test'
+      - SECRET_KEY=ZQbn05PDeA7v11
+  
+  script:
+    build:
+      context: ./csv_to_db
+      dockerfile: Dockerfile
+    volumes:
+      - './csv_to_db:/'
+
+  client:
+    build:
+      context: ./report_view
+      dockerfile: Dockerfile
+    volumes:
+      - './report_view:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 3008:3000
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_SERVICE_URL=http://localhost:8080
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - api
