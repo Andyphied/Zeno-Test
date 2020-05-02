@@ -19,7 +19,7 @@ app.config['MONGO_URI'] = MONGO_URI
 mongo = PyMongo(app)
 
 @app.route('/report', methods=['GET'])
-def get_all_stars():
+def get_all_data():
     data = mongo.db.temp_measurements
     output = []
     for s in data.find():
@@ -41,6 +41,20 @@ def get_all_stars():
     })
     
     return jsonify({'result':output})
+
+@app.route('/log', methods=['GET'])
+def get_log():
+    log = mongo.db.log
+    output =[]
+    logs = log.find()
+    for log in logs:
+        output.append({
+            'date_time_requested':log['date_time_requested'],
+            'data-size served': log['data-size served']
+        })
+    return jsonify({'result':output})
+
+
 
 
 if __name__ == '__main__':
