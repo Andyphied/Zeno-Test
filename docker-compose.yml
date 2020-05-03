@@ -1,6 +1,26 @@
 version: '3.7'
 
 services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - 27017:27017
+
+
+  script:
+    build:
+      context: ./csv_to_db
+      dockerfile: Dockerfile
+    volumes:
+      - './csv_to_db:/'
+    depends_on:
+      - mongo
+
+
   api:
     build:
       context: ./app_dir
@@ -15,13 +35,10 @@ services:
       - APP_SETTINGS=project.config.DevelopmentConfig
       - MONGO_URI='mongodb://localhost:27017/py_test'
       - SECRET_KEY=ZQbn05PDeA7v11
+    depends_on:
+      - mongo
   
-  script:
-    build:
-      context: ./csv_to_db
-      dockerfile: Dockerfile
-    volumes:
-      - './csv_to_db:/'
+  
 
   client:
     build:
@@ -38,3 +55,4 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - api
+      
